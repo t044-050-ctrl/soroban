@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>そろばん学習アプリ</title>
+
 <style>
   :root {
     --bg-main: #ffffff;
@@ -36,7 +37,7 @@
   }
 
   body {
-    background-color: #ffffff;
+    background-color: #f7fafc;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -48,7 +49,6 @@
     touch-action: none;
   }
 
-  /* 画面比16:9の全画面レスポンシブコンテナ */
   #app-wrapper {
     width: 1280px;
     height: 720px;
@@ -62,6 +62,7 @@
     flex-direction: column;
     overflow: hidden;
     touch-action: none;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   }
 
   main {
@@ -108,7 +109,6 @@
     font-weight: normal !important;
   }
 
-  /* トップページボタン */
   .chamfer-btn {
     background: linear-gradient(135deg, var(--bead-yellow-top) 0%, var(--bead-yellow-mid) 50%, var(--bead-yellow-bot) 100%);
     color: var(--frame-wood);
@@ -203,7 +203,6 @@
     color: #ffffff;
   }
 
-  /* フッター共通ボタンデザイン */
   .footer-btn {
     height: 40px;
     padding: 0 16px;
@@ -343,7 +342,6 @@
     max-width: 100%;
   }
 
-  /* そろばんフレーム（8桁） */
   .soroban-frame {
     background-color: #ffffff;
     border-top: 20px solid var(--frame-wood);
@@ -380,7 +378,6 @@
     pointer-events: none;
   }
 
-  /* 梁（Beam） */
   .beam {
     position: absolute;
     width: 100%;
@@ -394,7 +391,6 @@
     pointer-events: none;
   }
 
-  /* 定位点（右端の桁 Rod 7 のみ） */
   .unit-dot {
     position: absolute;
     width: 14px;
@@ -407,6 +403,11 @@
     z-index: 6;
     pointer-events: auto;
     transition: all 0.15s ease;
+    box-sizing: border-box;
+  }
+
+  .unit-dot.red-border {
+    border: 2.5px solid #e53e3e;
   }
 
   .digit-label {
@@ -452,7 +453,6 @@
     text-align: center;
   }
 
-  /* 玉 (bead) */
   .bead {
     width: 137.8px;
     height: 55px;
@@ -586,7 +586,6 @@
     height: 40px;
   }
 
-  /* 部位解説キャンバス */
   .parts-canvas-container {
     position: relative;
     width: 1134px;
@@ -631,7 +630,6 @@
     transition: opacity 0.2s ease;
   }
 
-  /* 正解・不正解オーバーレイ */
   #judge-overlay {
     position: fixed;
     top: 0;
@@ -657,7 +655,6 @@
     100% { transform: scale(1); opacity: 1; }
   }
 
-  /* 全問クリアモーダル */
   .modal-overlay {
     position: fixed;
     top: 0;
@@ -689,7 +686,6 @@
     position: relative;
   }
 
-  /* 三重円SVG */
   .triple-circle-svg {
     width: 180px;
     height: 180px;
@@ -713,26 +709,6 @@
       0 2px 0 #fff, 0 -2px 0 #fff,
       2px 0 0 #fff, -2px 0 0 #fff;
   }
-
-  .error-mark-badge {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 30;
-    pointer-events: none;
-    animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    background: rgba(255, 255, 255, 0.92);
-    border-radius: 50%;
-    width: 90px;
-    height: 90px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 4.5rem;
-    line-height: 1;
-    border: 4px solid #e53e3e;
-  }
 </style>
 </head>
 <body oncontextmenu="return false;">
@@ -740,7 +716,7 @@
 <div id="app-wrapper">
   <main id="main-area">
 
-    <!-- ① トップページ -->
+    <!-- Page 1: Main Menu -->
     <div id="page-1" class="page active">
       <div class="menu-grid">
         <div class="menu-title-cell">
@@ -761,15 +737,52 @@
             </g>
             
             <rect x="0" y="21" width="180" height="5" fill="#ECE9D3" stroke="#A8968C" stroke-width="1"/>
+            <circle cx="13" cy="23.5" r="1.5" fill="#000"/>
+            <circle cx="90" cy="23.5" r="2" fill="#000" stroke="#e53e3e" stroke-width="1"/>
             <circle cx="167" cy="23.5" r="1.5" fill="#000"/>
 
-            <polygon points="13,8 21,12 13,16 5,12" fill="url(#yellow-grad)"/>
-            <polygon points="38,13 46,17 38,21 30,17" fill="url(#orange-grad)"/>
-            <polygon points="64,8 72,12 64,16 56,12" fill="url(#yellow-grad)"/>
-            <polygon points="90,13 98,17 90,21 82,17" fill="url(#orange-grad)"/>
-            <polygon points="116,8 124,12 116,16 108,12" fill="url(#yellow-grad)"/>
-            <polygon points="141,13 149,17 141,21 133,17" fill="url(#orange-grad)"/>
-            <polygon points="167,8 175,12 167,16 159,12" fill="url(#yellow-grad)"/>
+            <polygon points="13,9 20,13.5 13,18 6,13.5" fill="url(#yellow-grad)"/>
+            <polygon points="38,9 45,13.5 38,18 31,13.5" fill="url(#orange-grad)"/>
+            <polygon points="64,9 71,13.5 64,18 57,13.5" fill="url(#yellow-grad)"/>
+            <polygon points="90,9 97,13.5 90,18 83,13.5" fill="url(#orange-grad)"/>
+            <polygon points="116,9 123,13.5 116,18 109,13.5" fill="url(#yellow-grad)"/>
+            <polygon points="141,9 148,13.5 141,18 134,13.5" fill="url(#orange-grad)"/>
+            <polygon points="167,9 174,13.5 167,18 160,13.5" fill="url(#yellow-grad)"/>
+
+            <polygon points="13,28 20,31.5 13,35 6,31.5" fill="url(#yellow-grad)"/>
+            <polygon points="13,35 20,38.5 13,42 6,38.5" fill="url(#yellow-grad)"/>
+            <polygon points="13,42 20,45.5 13,49 6,45.5" fill="url(#yellow-grad)"/>
+            <polygon points="13,49 20,52.5 13,56 6,52.5" fill="url(#yellow-grad)"/>
+
+            <polygon points="38,28 45,31.5 38,35 31,31.5" fill="url(#orange-grad)"/>
+            <polygon points="38,35 45,38.5 38,42 31,38.5" fill="url(#orange-grad)"/>
+            <polygon points="38,42 45,45.5 38,49 31,45.5" fill="url(#orange-grad)"/>
+            <polygon points="38,49 45,52.5 38,56 31,52.5" fill="url(#orange-grad)"/>
+
+            <polygon points="64,28 71,31.5 64,35 57,31.5" fill="url(#yellow-grad)"/>
+            <polygon points="64,35 71,38.5 64,42 57,38.5" fill="url(#yellow-grad)"/>
+            <polygon points="64,42 71,45.5 64,49 57,45.5" fill="url(#yellow-grad)"/>
+            <polygon points="64,49 71,52.5 64,56 57,52.5" fill="url(#yellow-grad)"/>
+
+            <polygon points="90,28 97,31.5 90,35 83,31.5" fill="url(#orange-grad)"/>
+            <polygon points="90,35 97,38.5 90,42 83,38.5" fill="url(#orange-grad)"/>
+            <polygon points="90,42 97,45.5 90,49 83,45.5" fill="url(#orange-grad)"/>
+            <polygon points="90,49 97,52.5 90,56 83,52.5" fill="url(#orange-grad)"/>
+
+            <polygon points="116,28 123,31.5 116,35 109,31.5" fill="url(#yellow-grad)"/>
+            <polygon points="116,35 123,38.5 116,42 109,38.5" fill="url(#yellow-grad)"/>
+            <polygon points="116,42 123,45.5 116,49 109,45.5" fill="url(#yellow-grad)"/>
+            <polygon points="116,49 123,52.5 116,56 109,52.5" fill="url(#yellow-grad)"/>
+
+            <polygon points="141,28 148,31.5 141,35 134,31.5" fill="url(#orange-grad)"/>
+            <polygon points="141,35 148,38.5 141,42 134,38.5" fill="url(#orange-grad)"/>
+            <polygon points="141,42 148,45.5 141,49 134,45.5" fill="url(#orange-grad)"/>
+            <polygon points="141,49 148,52.5 141,56 134,52.5" fill="url(#orange-grad)"/>
+
+            <polygon points="167,28 174,31.5 167,35 160,31.5" fill="url(#yellow-grad)"/>
+            <polygon points="167,35 174,38.5 167,42 160,38.5" fill="url(#yellow-grad)"/>
+            <polygon points="167,42 174,45.5 167,49 160,45.5" fill="url(#yellow-grad)"/>
+            <polygon points="167,49 174,52.5 167,56 160,52.5" fill="url(#yellow-grad)"/>
 
             <defs>
               <linearGradient id="yellow-grad" x1="0" y1="0" x2="0" y2="1">
@@ -820,7 +833,7 @@
       </div>
     </div>
 
-    <!-- ② 拡大そろばん -->
+    <!-- Page 2: Expanded Free Soroban -->
     <div id="page-2" class="page">
       <div class="soroban-container-wrapper">
         <div id="soroban-p2" class="soroban-frame"></div>
@@ -831,25 +844,23 @@
       </div>
     </div>
 
-    <!-- ③ そろばんの名前 -->
+    <!-- Page 3: Parts Identification -->
     <div id="page-3" class="page">
       <div class="parts-canvas-container" id="p3-parts-container">
-        <!-- SVG引出線オーバーレイ -->
         <svg class="parts-svg-overlay" id="p3-svg-lines" viewBox="0 0 1134 520">
           <line x1="160" y1="26" x2="200" y2="62" stroke="#e53e3e" stroke-width="4" stroke-linecap="round"/>
           <line x1="320" y1="31" x2="353" y2="105" stroke="#e53e3e" stroke-width="4" stroke-linecap="round"/>
           <line x1="470" y1="21" x2="353" y2="170" stroke="#e53e3e" stroke-width="4" stroke-linecap="round"/>
-          <line x1="1040" y1="31" x2="990" y2="187" stroke="#e53e3e" stroke-width="4" stroke-linecap="round"/>
-          <line x1="880" y1="36" x2="920" y2="200" stroke="#e53e3e" stroke-width="4" stroke-linecap="round"/>
+          <line x1="700" y1="31" x2="638" y2="197" stroke="#e53e3e" stroke-width="4" stroke-linecap="round"/>
+          <line x1="920" y1="36" x2="920" y2="200" stroke="#e53e3e" stroke-width="4" stroke-linecap="round"/>
           <line x1="710" y1="474" x2="640" y2="330" stroke="#e53e3e" stroke-width="4" stroke-linecap="round"/>
         </svg>
 
-        <!-- 名前バッジ -->
         <button class="part-mask-btn" id="p3-mask-waku" style="top: 0px; left: 100px;" onclick="togglePartMask('waku')">？</button>
         <button class="part-mask-btn" id="p3-mask-5dama" style="top: 5px; left: 270px;" onclick="togglePartMask('5dama')">？</button>
         <button class="part-mask-btn" id="p3-mask-keta" style="top: -5px; left: 420px;" onclick="togglePartMask('keta')">？</button>
-        <button class="part-mask-btn" id="p3-mask-teiiten" style="top: 5px; left: 980px;" onclick="togglePartMask('teiiten')">？</button>
-        <button class="part-mask-btn" id="p3-mask-hari" style="top: 10px; left: 830px;" onclick="togglePartMask('hari')">？</button>
+        <button class="part-mask-btn" id="p3-mask-teiiten" style="top: 5px; left: 650px;" onclick="togglePartMask('teiiten')">？</button>
+        <button class="part-mask-btn" id="p3-mask-hari" style="top: 10px; left: 870px;" onclick="togglePartMask('hari')">？</button>
         <button class="part-mask-btn" id="p3-mask-1dama" style="top: 460px; left: 660px;" onclick="togglePartMask('1dama')">？</button>
 
         <div id="soroban-p3" class="soroban-frame" style="margin-bottom: 20px;"></div>
@@ -866,12 +877,12 @@
       </div>
     </div>
 
-    <!-- ④ 数をよもう -->
+    <!-- Page 4: Read Numbers -->
     <div id="page-4" class="page">
       <div class="soroban-container-wrapper">
         <div id="soroban-p4" class="soroban-frame"></div>
         
-        <div style="width: 1134px; margin-top: 56px; display: flex; align-items: center; justify-content: space-between; position: relative;">
+        <div style="width: 1134px; margin-top: 56px; display: flex; align-items: center; justify-content: flex-start; position: relative;">
           <div style="display: flex; gap: 8px; align-items: center;">
             <button class="gohasan-btn" id="p4-gohasan-btn" onclick="resetP4Board()">ご破算</button>
             <button class="toggle-label-btn" id="p4-toggle-label-btn" onclick="toggleDigitLabels('p4')">位：非表示</button>
@@ -881,9 +892,9 @@
             </div>
           </div>
           
-          <div style="display: flex; align-items: center; gap: 12px; margin-left: auto;">
+          <div style="display: flex; align-items: center; gap: 12px; margin-left: 60px;">
             <span id="p4-stage-badge" class="progress-badge" style="background: #e2e8f0; border-color: #cbd5e0; color: #2d3748;">ステージ1</span>
-            <input type="text" id="p4-ans-display" inputmode="decimal" placeholder="数字を入力" oninput="filterInput(this)" onkeydown="onP4InputKeyDown(event)" style="width: 170px; height: 40px; font-size: 1.4rem; text-align: center; border: 2px solid #cbd5e0; border-radius: 8px; font-weight: bold; background-color: #fff;">
+            <input type="text" id="p4-ans-display" readonly placeholder="数字を入力" style="width: 170px; height: 40px; font-size: 1.4rem; text-align: center; border: 2px solid #cbd5e0; border-radius: 8px; font-weight: bold; background-color: #fff;">
             <span id="p4-progress-badge" class="progress-badge">1 / 3</span>
             <button class="footer-btn active" id="p4-check-btn" style="height: 40px; background-color: var(--btn-green); border-color: var(--btn-green);" onclick="checkP4Answer()">答え合わせ</button>
           </div>
@@ -906,7 +917,7 @@
       </div>
     </div>
 
-    <!-- ⑤ 数を入れよう -->
+    <!-- Page 5: Put Numbers -->
     <div id="page-5" class="page">
       <div class="soroban-container-wrapper">
         <div id="p5-q-title" class="question-card" style="font-size: 2.1rem;">---</div>
@@ -938,7 +949,7 @@
       </div>
     </div>
 
-    <!-- ⑥ たし算・ひき算 -->
+    <!-- Page 6: Addition and Subtraction -->
     <div id="page-6" class="page">
       <div class="soroban-container-wrapper">
         <div style="width: 1134px; display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 2px;">
@@ -946,7 +957,6 @@
           <div style="position: absolute; right: 0; display: flex; gap: 8px; align-items: center;">
             <button class="icon-btn active" id="p6-mode-add" style="padding: 4px 12px; font-size: 0.85rem;" onclick="setP6Mode('add')">＋ たし算</button>
             <button class="icon-btn" id="p6-mode-sub" style="padding: 4px 12px; font-size: 0.85rem;" onclick="setP6Mode('sub')">－ ひき算</button>
-            <button class="icon-btn" id="p6-mode-rand" style="padding: 4px 12px; font-size: 0.85rem;" onclick="setP6Mode('rand')">🎲 ミックス</button>
           </div>
         </div>
         <div style="position: relative; width: 1134px;">
@@ -979,7 +989,7 @@
       </div>
     </div>
 
-    <!-- ⑦ 1～10までたすと -->
+    <!-- Page 7: Sum 1 to 10 -->
     <div id="page-7" class="page">
       <div class="soroban-container-wrapper">
         <div id="p7-q-title" class="question-card" style="font-size: 2.1rem;">1 から 10 まで たしてみよう</div>
@@ -989,12 +999,15 @@
           <div style="display: flex; gap: 8px; align-items: center;">
             <button class="gohasan-btn" id="p7-gohasan-btn" onclick="resetP7DemoBoard()">ご破算</button>
             <button class="toggle-label-btn" id="p7-toggle-label-btn" onclick="toggleDigitLabels('p7')">位：非表示</button>
-            <button class="toggle-label-btn active" id="p7-step-mode-btn" onclick="toggleP7StepMode()">連続</button>
+            <div class="grade-btn-group">
+              <button class="grade-btn active" id="p7-mode-continuous" onclick="setP7StepMode('continuous')">連続</button>
+              <button class="grade-btn" id="p7-mode-step" onclick="setP7StepMode('step')">1つずつ</button>
+            </div>
           </div>
 
           <div style="position: absolute; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 12px;">
             <button class="footer-btn active" id="p7-check-btn" style="height: 40px; padding: 0 16px; background-color: var(--btn-green); border-color: var(--btn-green);" onclick="checkP7Answer()">答え合わせ</button>
-            <span id="p7-step-badge" class="progress-badge" style="height: 40px;">つぎ: +1</span>
+            <span id="p7-step-badge" class="progress-badge" style="height: 40px; color: #e53e3e; border-color: #e53e3e; background-color: #fff5f5;">＋1</span>
           </div>
 
           <div style="display: flex; gap: 8px; align-items: center;">
@@ -1009,7 +1022,6 @@
 
   </main>
 
-  <!-- フッター -->
   <footer>
     <div class="footer-left">
       <button id="btn-back-top" class="footer-btn" onclick="goToPage(1)" style="display: none;">
@@ -1025,12 +1037,10 @@
   </footer>
 </div>
 
-<!-- 正解・不正解アニメーションオーバーレイ -->
 <div id="judge-overlay">
   <div id="judge-symbol">⭕</div>
 </div>
 
-<!-- クリアモーダル -->
 <div id="clear-modal" class="modal-overlay">
   <div class="modal-card">
     <div class="triple-circle-svg">
@@ -1049,12 +1059,26 @@
 </div>
 
 <script>
-/* -------------------------------------------------------------
- * 1. 音源・サウンドエフェクト
- * ------------------------------------------------------------- */
+let globalGrade = 3;
+let currentPage = 1;
 let soundEnabled = true;
 let audioCtx = null;
 
+// Scales the app layout responsively to fit the viewport dimensions
+function updateAppScale() {
+  const wrapper = document.getElementById('app-wrapper');
+  if (!wrapper) return;
+  const targetWidth = 1280;
+  const targetHeight = 720;
+  const scaleX = window.innerWidth / targetWidth;
+  const scaleY = window.innerHeight / targetHeight;
+  const scale = Math.min(scaleX, scaleY);
+  document.documentElement.style.setProperty('--app-scale', scale);
+}
+
+window.addEventListener('resize', updateAppScale);
+
+// Web Audio API helpers for interactive sound effects
 function getAudioContext() {
   if (!audioCtx) {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -1065,149 +1089,145 @@ function getAudioContext() {
   if (audioCtx && audioCtx.state === 'suspended') {
     audioCtx.resume();
   }
-  return audioCtx;
 }
 
 function toggleSound() {
   soundEnabled = !soundEnabled;
   const btn = document.getElementById('sound-toggle-btn');
-  const text = document.getElementById('sound-text');
   const icon = document.getElementById('sound-icon');
-  
-  if (soundEnabled) {
-    btn.classList.add('active');
-    text.textContent = "音:ON";
-    icon.textContent = "🔊";
-  } else {
-    btn.classList.remove('active');
-    text.textContent = "音:OFF";
-    icon.textContent = "🔇";
+  const text = document.getElementById('sound-text');
+  if (btn && icon && text) {
+    if (soundEnabled) {
+      btn.classList.add('active');
+      icon.textContent = '🔊';
+      text.textContent = '音:ON';
+    } else {
+      btn.classList.remove('active');
+      icon.textContent = '🔇';
+      text.textContent = '音:OFF';
+    }
   }
 }
 
 function playBeadSound() {
   if (!soundEnabled) return;
-  const ctx = getAudioContext();
-  if (!ctx) return;
+  getAudioContext();
+  if (!audioCtx) return;
+  try {
+    const now = audioCtx.currentTime;
 
-  const bufferSize = ctx.sampleRate * 0.04;
-  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-  const data = buffer.getChannelData(0);
-  for (let i = 0; i < bufferSize; i++) {
-    data[i] = Math.random() * 2 - 1;
-  }
+    // 1. Noise burst
+    const bufferSize = Math.floor(audioCtx.sampleRate * 0.012);
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = buffer;
 
-  const noise = ctx.createBufferSource();
-  noise.buffer = buffer;
+    const noiseFilter = audioCtx.createBiquadFilter();
+    noiseFilter.type = 'bandpass';
+    noiseFilter.frequency.setValueAtTime(2800 + Math.random() * 600, now);
+    noiseFilter.Q.setValueAtTime(1.8, now);
 
-  const filter = ctx.createBiquadFilter();
-  filter.type = 'bandpass';
-  filter.frequency.setValueAtTime(1200 + Math.random() * 300, ctx.currentTime);
-  filter.Q.setValueAtTime(3.0, ctx.currentTime);
+    const noiseGain = audioCtx.createGain();
+    noiseGain.gain.setValueAtTime(0.35, now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.012);
 
-  const gain = ctx.createGain();
-  gain.gain.setValueAtTime(0.6, ctx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.035);
+    noise.connect(noiseFilter);
+    noiseFilter.connect(noiseGain);
+    noiseGain.connect(audioCtx.destination);
 
-  noise.connect(filter);
-  filter.connect(gain);
-  gain.connect(ctx.destination);
+    // 2. Wood resonance tone
+    const osc = audioCtx.createOscillator();
+    const oscGain = audioCtx.createGain();
+    osc.type = 'triangle';
+    const baseFreq = 1400 + Math.random() * 250;
+    osc.frequency.setValueAtTime(baseFreq, now);
+    osc.frequency.exponentialRampToValueAtTime(160, now + 0.02);
 
-  noise.start();
+    oscGain.gain.setValueAtTime(0.28, now);
+    oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
+
+    osc.connect(oscGain);
+    oscGain.connect(audioCtx.destination);
+
+    noise.start(now);
+    osc.start(now);
+    osc.stop(now + 0.02);
+  } catch(e) {}
 }
 
 function playCorrectSound() {
   if (!soundEnabled) return;
-  const ctx = getAudioContext();
-  if (!ctx) return;
-
-  const now = ctx.currentTime;
-  const osc1 = ctx.createOscillator();
-  osc1.type = 'sine';
-  osc1.frequency.setValueAtTime(659.25, now);
-  osc1.frequency.setValueAtTime(880, now + 0.15);
-
-  const gain = ctx.createGain();
-  gain.gain.setValueAtTime(0.3, now);
-  gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
-
-  osc1.connect(gain);
-  gain.connect(ctx.destination);
-
-  osc1.start(now);
-  osc1.stop(now + 0.6);
+  getAudioContext();
+  if (!audioCtx) return;
+  try {
+    const now = audioCtx.currentTime;
+    const osc1 = audioCtx.createOscillator();
+    const osc2 = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc1.frequency.setValueAtTime(659.25, now);
+    osc2.frequency.setValueAtTime(880, now + 0.1);
+    gain.gain.setValueAtTime(0.2, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+    osc1.connect(gain);
+    osc2.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc1.start(now);
+    osc1.stop(now + 0.1);
+    osc2.start(now + 0.1);
+    osc2.stop(now + 0.4);
+  } catch(e) {}
 }
 
 function playIncorrectSound() {
   if (!soundEnabled) return;
-  const ctx = getAudioContext();
-  if (!ctx) return;
-
-  const now = ctx.currentTime;
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-
-  osc.type = 'sawtooth';
-  osc.frequency.setValueAtTime(150, now);
-  osc.frequency.setValueAtTime(110, now + 0.18);
-
-  gain.gain.setValueAtTime(0.3, now);
-  gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
-
-  osc.connect(gain);
-  gain.connect(ctx.destination);
-
-  osc.start(now);
-  osc.stop(now + 0.4);
+  getAudioContext();
+  if (!audioCtx) return;
+  try {
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(150, now);
+    osc.frequency.setValueAtTime(120, now + 0.15);
+    gain.gain.setValueAtTime(0.2, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(now);
+    osc.stop(now + 0.35);
+  } catch(e) {}
 }
 
 function playFanfareSound() {
   if (!soundEnabled) return;
-  const ctx = getAudioContext();
-  if (!ctx) return;
-
-  const notes = [523.25, 659.25, 783.99, 1046.50];
-  notes.forEach((freq, idx) => {
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    const start = ctx.currentTime + idx * 0.12;
-
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(freq, start);
-
-    gain.gain.setValueAtTime(0.3, start);
-    gain.gain.exponentialRampToValueAtTime(0.001, start + (idx === 3 ? 0.8 : 0.25));
-
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-
-    osc.start(start);
-    osc.stop(start + (idx === 3 ? 0.8 : 0.25));
-  });
+  getAudioContext();
+  if (!audioCtx) return;
+  try {
+    const notes = [523.25, 659.25, 783.99, 1046.50];
+    notes.forEach((freq, idx) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      const now = audioCtx.currentTime + idx * 0.12;
+      osc.frequency.setValueAtTime(freq, now);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.25);
+    });
+  } catch(e) {}
 }
-
-/* -------------------------------------------------------------
- * 2. アプリ全体の基盤設定
- * ------------------------------------------------------------- */
-let globalGrade = 3;
-let currentPage = 1;
-
-function updateAppScale() {
-  const wrapper = document.getElementById('app-wrapper');
-  const targetW = 1280;
-  const targetH = 720;
-  const winW = window.innerWidth;
-  const winH = window.innerHeight;
-
-  const scale = Math.min(winW / targetW, winH / targetH);
-  wrapper.style.setProperty('--app-scale', scale);
-}
-
-window.addEventListener('resize', updateAppScale);
-window.addEventListener('DOMContentLoaded', updateAppScale);
 
 function setGlobalGrade(grade) {
   globalGrade = grade;
+  if (document.activeElement && typeof document.activeElement.blur === 'function') {
+    document.activeElement.blur();
+  }
   
   ['top-grade-3', 'p3-grade-3', 'p4-grade-3', 'p5-grade-3', 'p6-grade-3'].forEach(id => {
     const el = document.getElementById(id);
@@ -1240,27 +1260,26 @@ function setGlobalGrade(grade) {
   if (currentPage === 6) initP6Problem();
 }
 
-/* -------------------------------------------------------------
- * 3. そろばんエンジン (SorobanBoard Class)
- * ------------------------------------------------------------- */
 class SorobanBoard {
   constructor(containerId, options = {}) {
-    this.container = document.getElementById(containerId);
+    this.container = typeof containerId === 'string' ? document.getElementById(containerId) : containerId;
     this.numRods = options.numRods || 8;
     this.showLabels = options.showLabels !== undefined ? options.showLabels : false;
     this.isInteractive = options.isInteractive !== undefined ? options.isInteractive : true;
     this.isLocked = false;
     
-    // 状態: { top: 0|1, bot: 0~4 }
     this.state = Array.from({ length: this.numRods }, () => ({ top: 0, bot: 0 }));
     this.beadElements = [];
     this.labelElements = [];
     this.unitDotElements = [];
 
-    this.render();
+    if (this.container) {
+      this.render();
+    }
   }
 
   render() {
+    if (!this.container) return;
     this.container.innerHTML = '';
     this.beadElements = [];
     this.labelElements = [];
@@ -1279,10 +1298,10 @@ class SorobanBoard {
       rodLine.className = 'rod-line';
       rod.appendChild(rodLine);
 
-      // 定位点: 一番右の桁（軸: index 7）のみに配置
-      if (r === 7) {
+      const rightIndex = this.numRods - r;
+      if (rightIndex === 1 || rightIndex === 4 || rightIndex === 7) {
         const unitDot = document.createElement('div');
-        unitDot.className = 'unit-dot';
+        unitDot.className = 'unit-dot' + (rightIndex === 4 ? ' red-border' : '');
         rod.appendChild(unitDot);
         this.unitDotElements.push(unitDot);
       }
@@ -1293,7 +1312,6 @@ class SorobanBoard {
       rod.appendChild(label);
       this.labelElements.push(label);
 
-      // 五玉: OFF(上枠ピッタリ 0px) / ON(梁上辺ピッタリ 60px)
       const topBead = document.createElement('div');
       topBead.className = 'bead top-bead';
       topBead.dataset.rod = r;
@@ -1302,11 +1320,6 @@ class SorobanBoard {
       topBead.style.top = '0px';
       rod.appendChild(topBead);
 
-      // 一玉 (4つ): OFF(下枠ピッタリ) / ON(梁下辺ピッタリ)
-      // 下枠の可動域: 梁下 139px から 下フレーム0px (410px)
-      // 各玉の高さ h = 55px. 4個合計 220px.
-      // OFF位置: 最下段ピッタリ (355px, 300px, 245px, 190px)
-      // ON位置: 梁下ピッタリ (139px, 194px, 249px, 304px)
       const botBeads = [];
       for (let b = 0; b < 4; b++) {
         const botBead = document.createElement('div');
@@ -1355,11 +1368,11 @@ class SorobanBoard {
   }
 
   updateBeadPositions(animate = true) {
+    if (!this.container) return;
     for (let r = 0; r < this.numRods; r++) {
       const st = this.state[r];
       const beads = this.beadElements[r];
 
-      // 五玉: OFF = 0px (上枠密着), ON = 60px (梁上辺密着)
       if (st.top === 1) {
         beads.top.style.top = '60px';
         beads.top.classList.add('active');
@@ -1368,15 +1381,12 @@ class SorobanBoard {
         beads.top.classList.remove('active');
       }
 
-      // 一玉 (4つ)
       for (let b = 0; b < 4; b++) {
         const bead = beads.bot[b];
         if (b < st.bot) {
-          // ON (上がっている): 梁下辺 139px から密着
           bead.style.top = `${139 + b * 55}px`;
           bead.classList.add('active');
         } else {
-          // OFF (下がっている): 下枠 410px から密着
           bead.style.top = `${190 + b * 55}px`;
           bead.classList.remove('active');
         }
@@ -1385,7 +1395,7 @@ class SorobanBoard {
   }
 
   updateDigitLabels() {
-    // 指定順序（左から順に）: 「万」「千」「百」「十」「一」「1/10」「1/100」「1/1000」
+    if (!this.container) return;
     const labels = ["万", "千", "百", "十", "一", "1/10", "1/100", "1/1000"];
 
     for (let r = 0; r < this.numRods; r++) {
@@ -1422,7 +1432,6 @@ class SorobanBoard {
   }
 
   getValue() {
-    // Rod 4 が 一の位
     let val = 0;
     const basePow = [10000, 1000, 100, 10, 1, 0.1, 0.01, 0.001];
     for (let r = 0; r < this.numRods; r++) {
@@ -1451,9 +1460,6 @@ class SorobanBoard {
   }
 }
 
-/* -------------------------------------------------------------
- * 4. ページ・ボードの統括管理
- * ------------------------------------------------------------- */
 const boards = {};
 
 window.onload = function() {
@@ -1467,8 +1473,13 @@ window.onload = function() {
   updateAppScale();
   goToPage(1);
 
-  // グローバルキーイベント (クリアモーダルのEnter・Page4入力対応)
   window.addEventListener('keydown', (e) => {
+    if (document.activeElement && document.activeElement.tagName === 'BUTTON') {
+      if (e.key === 'Enter' || e.key === ' ') {
+        document.activeElement.blur();
+      }
+    }
+
     const clearModal = document.getElementById('clear-modal');
     if (clearModal.classList.contains('active')) {
       if (e.key === 'Enter') {
@@ -1479,12 +1490,16 @@ window.onload = function() {
 
     if (currentPage === 4) {
       if (e.key >= '0' && e.key <= '9') {
+        e.preventDefault();
         pressKey(e.key);
       } else if (e.key === '.') {
+        e.preventDefault();
         pressKey('.');
       } else if (e.key === 'Backspace') {
+        e.preventDefault();
         pressKey('BS');
       } else if (e.key === 'Enter') {
+        e.preventDefault();
         checkP4Answer();
       }
     }
@@ -1510,6 +1525,7 @@ function goToPage(pageNum) {
   } else {
     btnBack.style.display = 'flex';
     const titles = [
+      '',
       '',
       '① 拡大そろばん',
       '② そろばんの名前',
@@ -1544,16 +1560,10 @@ function toggleDigitLabels(pageKey) {
   }
 }
 
-/* -------------------------------------------------------------
- * 5. 各ページ専用ロジック
- * ------------------------------------------------------------- */
-
-// --- Page 2: 拡大そろばん ---
 function resetP2Board() {
   boards['p2'].reset();
 }
 
-// --- Page 3: そろばんの名前 ---
 const partsState = {
   waku: false,
   '5dama': false,
@@ -1635,7 +1645,6 @@ function resetP3Board() {
   boards['p3'].reset();
 }
 
-// --- Page 4: 数をよもう ---
 let p4Stage = 1;
 let p4Step = 1;
 let p4TotalSteps = 3;
@@ -1668,7 +1677,6 @@ function p4NextQuestion() {
     p4CurrentVal = generateP4RandomProblem();
     p4PoolHistory.push(p4CurrentVal);
   } else {
-    // ステージ4以降: 全問題プールからランダム
     if (p4PoolHistory.length === 0) {
       p4CurrentVal = generateP4RandomProblem();
     } else {
@@ -1680,14 +1688,33 @@ function p4NextQuestion() {
 }
 
 function generateP4RandomProblem() {
+  const isZeroProblem = Math.random() < 0.1;
+
   if (globalGrade === 3) {
-    // 3〜4桁整数 / 空位「0」優先
-    const zeros = [102, 305, 4080, 7002, 506, 9010, 3004, 809];
-    return zeros[Math.floor(Math.random() * zeros.length)];
+    if (isZeroProblem) {
+      const zeros = [102, 305, 4080, 7002, 506, 9010, 3004, 809, 1050, 407, 2301, 8040, 607];
+      return zeros[Math.floor(Math.random() * zeros.length)];
+    } else {
+      const len = Math.floor(Math.random() * 3) + 2;
+      let numStr = "";
+      for (let i = 0; i < len; i++) {
+        numStr += (Math.floor(Math.random() * 9) + 1);
+      }
+      return parseInt(numStr, 10);
+    }
   } else {
-    // 整数部〜99/小数部第2位まで/空位「0」含む
-    const decimals = [1.08, 20.5, 3.09, 45.02, 7.60, 10.04, 0.08, 90.35];
-    return decimals[Math.floor(Math.random() * decimals.length)];
+    if (isZeroProblem) {
+      const decimals = [1.08, 20.5, 3.09, 45.02, 7.60, 10.04, 0.08, 90.35, 2.05, 10.7, 30.04];
+      return decimals[Math.floor(Math.random() * decimals.length)];
+    } else {
+      const intLen = Math.floor(Math.random() * 2) + 1;
+      const decLen = Math.floor(Math.random() * 2) + 1;
+      let s = "";
+      for (let i = 0; i < intLen; i++) s += (Math.floor(Math.random() * 9) + 1);
+      s += ".";
+      for (let i = 0; i < decLen; i++) s += (Math.floor(Math.random() * 9) + 1);
+      return parseFloat(s);
+    }
   }
 }
 
@@ -1714,12 +1741,6 @@ function filterInput(input) {
   input.value = input.value.replace(/[^0-9.]/g, '');
 }
 
-function onP4InputKeyDown(e) {
-  if (e.key === 'Enter') {
-    checkP4Answer();
-  }
-}
-
 function checkP4Answer() {
   const input = document.getElementById('p4-ans-display');
   const userVal = parseFloat(input.value);
@@ -1743,7 +1764,6 @@ function checkP4Answer() {
   }
 }
 
-// --- Page 5: 数を入れよう ---
 let p5Stage = 1;
 let p5Step = 1;
 let p5TotalSteps = 4;
@@ -1819,7 +1839,6 @@ function checkP5Answer() {
   }
 }
 
-// --- Page 6: たし算・ひき算 ---
 let p6Mode = 'add';
 let p6Stage = 1;
 let p6Step = 1;
@@ -1832,10 +1851,12 @@ let p6PoolHistory = [];
 
 function setP6Mode(mode) {
   p6Mode = mode;
-  ['p6-mode-add', 'p6-mode-sub', 'p6-mode-rand'].forEach(id => {
-    document.getElementById(id).classList.remove('active');
+  ['p6-mode-add', 'p6-mode-sub'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('active');
   });
-  document.getElementById(`p6-mode-${mode}`).classList.add('active');
+  const currentBtn = document.getElementById(`p6-mode-${mode}`);
+  if (currentBtn) currentBtn.classList.add('active');
   initP6Problem();
 }
 
@@ -1848,7 +1869,7 @@ function initP6Problem() {
 
 function p6NextQuestion() {
   if (p6Stage === 1) {
-    p6TotalSteps = globalGrade === 3 ? (p6Mode === 'rand' ? 12 : 6) : (p6Mode === 'rand' ? 6 : 3);
+    p6TotalSteps = globalGrade === 3 ? 6 : 3;
   } else if (p6Stage === 2) {
     p6TotalSteps = 3;
   } else {
@@ -1857,7 +1878,7 @@ function p6NextQuestion() {
 
   document.getElementById('p6-stage-badge').textContent = `ステージ ${p6Stage}`;
   document.getElementById('p6-progress-badge').textContent = `${p6Step} / ${p6TotalSteps}`;
-  boards['p6'].reset(); // 初期状態：ご破算
+  boards['p6'].reset();
 
   if (p6Stage === 1) {
     if (globalGrade === 3) {
@@ -1865,16 +1886,12 @@ function p6NextQuestion() {
       const subs = [[48,36], [34,12], [68,52], [78,63], [83,73], [99,18]];
       
       let item;
-      if (p6Mode === 'add') {
-        item = adds[(p6Step - 1) % adds.length];
-        p6Op = '+';
-      } else if (p6Mode === 'sub') {
+      if (p6Mode === 'sub') {
         item = subs[(p6Step - 1) % subs.length];
         p6Op = '-';
       } else {
-        const mix = [...adds.map(a => [...a, '+']), ...subs.map(s => [...s, '-'])];
-        item = mix[(p6Step - 1) % mix.length];
-        p6Op = item[2];
+        item = adds[(p6Step - 1) % adds.length];
+        p6Op = '+';
       }
       p6Num1 = item[0];
       p6Num2 = item[1];
@@ -1883,22 +1900,17 @@ function p6NextQuestion() {
       const subs = [[1.25,0.86], [2.43,1.78], [5.14,3.96]];
       
       let item;
-      if (p6Mode === 'add') {
-        item = adds[(p6Step - 1) % adds.length];
-        p6Op = '+';
-      } else if (p6Mode === 'sub') {
+      if (p6Mode === 'sub') {
         item = subs[(p6Step - 1) % subs.length];
         p6Op = '-';
       } else {
-        const mix = [...adds.map(a => [...a, '+']), ...subs.map(s => [...s, '-'])];
-        item = mix[(p6Step - 1) % mix.length];
-        p6Op = item[2];
+        item = adds[(p6Step - 1) % adds.length];
+        p6Op = '+';
       }
       p6Num1 = item[0];
       p6Num2 = item[1];
     }
   } else {
-    // ステージ2, 3...
     if (p6Stage === 2 || p6Stage === 3) {
       const prob = generateP6RandomProblem();
       p6Num1 = prob.n1;
@@ -1924,20 +1936,59 @@ function p6NextQuestion() {
   document.getElementById('p6-q-title').textContent = `${p6Num1} ${p6Op} ${p6Num2} = ?`;
 }
 
+function isNoComplement3rd(n1, n2, isSub) {
+  const digits1 = [Math.floor(n1 / 10), n1 % 10];
+  const digits2 = [Math.floor(n2 / 10), n2 % 10];
+
+  for (let i = 0; i < 2; i++) {
+    const d1 = digits1[i];
+    const d2 = digits2[i];
+
+    const top1 = Math.floor(d1 / 5);
+    const bot1 = d1 % 5;
+    const top2 = Math.floor(d2 / 5);
+    const bot2 = d2 % 5;
+
+    if (isSub) {
+      if (top1 < top2 || bot1 < bot2) return false;
+    } else {
+      if (top1 + top2 > 1 || bot1 + bot2 >= 5) return false;
+    }
+  }
+  return true;
+}
+
 function generateP6RandomProblem() {
   let op = p6Mode;
-  if (op === 'rand') op = Math.random() < 0.5 ? 'add' : 'sub';
 
   if (globalGrade === 3) {
-    // 繰り上がり/下がりなしの2桁
-    const n1 = Math.floor(Math.random() * 40) + 10;
-    const n2 = Math.floor(Math.random() * 40) + 10;
-    return { n1, n2, op: op === 'add' ? '+' : '-' };
+    let attempts = 0;
+    while (attempts < 1000) {
+      const n1 = Math.floor(Math.random() * 80) + 10;
+      const n2 = Math.floor(Math.random() * 80) + 10;
+      if (op === 'sub') {
+        if (n1 > n2 && isNoComplement3rd(n1, n2, true)) {
+          return { n1, n2, op: '-' };
+        }
+      } else {
+        if (isNoComplement3rd(n1, n2, false)) {
+          return { n1, n2, op: '+' };
+        }
+      }
+      attempts++;
+    }
+    return op === 'sub' ? { n1: 48, n2: 36, op: '-' } : { n1: 63, n2: 25, op: '+' };
   } else {
-    // 1桁整数.小数第2位
-    const n1 = Math.round((Math.random() * 5 + 2) * 100) / 100;
-    const n2 = Math.round((Math.random() * 2 + 1) * 100) / 100;
-    return { n1, n2, op: op === 'add' ? '+' : '-' };
+    let n1 = Math.round((Math.random() * 5 + 3) * 100) / 100;
+    let n2 = Math.round((Math.random() * 2 + 1) * 100) / 100;
+    if (op === 'sub') {
+      if (n1 <= n2) {
+        n1 = Math.round((n2 + Math.random() * 3 + 0.5) * 100) / 100;
+      }
+      return { n1, n2, op: '-' };
+    } else {
+      return { n1, n2, op: '+' };
+    }
   }
 }
 
@@ -1964,10 +2015,9 @@ function checkP6Answer() {
   }
 }
 
-// --- Page 7: 1～10までたすと ---
 let p7CurrentAddNum = 1;
 let p7CumulativeVal = 0;
-let p7StepMode = 'continuous'; // 'continuous' または 'step'
+let p7StepMode = 'continuous';
 
 function initP7Problem() {
   p7CurrentAddNum = 1;
@@ -1976,21 +2026,23 @@ function initP7Problem() {
   updateP7UI();
 }
 
-function toggleP7StepMode() {
-  p7StepMode = p7StepMode === 'continuous' ? 'step' : 'continuous';
-  const btn = document.getElementById('p7-step-mode-btn');
-  if (p7StepMode === 'continuous') {
-    btn.textContent = "連続";
-    btn.classList.add('active');
+function setP7StepMode(mode) {
+  if (p7StepMode === mode) return;
+  p7StepMode = mode;
+  const btnCont = document.getElementById('p7-mode-continuous');
+  const btnStep = document.getElementById('p7-mode-step');
+  if (mode === 'continuous') {
+    if (btnCont) btnCont.classList.add('active');
+    if (btnStep) btnStep.classList.remove('active');
   } else {
-    btn.textContent = "1つずつ";
-    btn.classList.remove('active');
+    if (btnCont) btnCont.classList.remove('active');
+    if (btnStep) btnStep.classList.add('active');
   }
   initP7Problem();
 }
 
 function updateP7UI() {
-  document.getElementById('p7-step-badge').textContent = `つぎ: +${p7CurrentAddNum}`;
+  document.getElementById('p7-step-badge').textContent = `＋${p7CurrentAddNum}`;
 }
 
 function resetP7DemoBoard() {
@@ -2001,7 +2053,6 @@ function checkP7Answer() {
   const userVal = boards['p7'].getValue();
 
   if (p7StepMode === 'continuous') {
-    // +10 完了の 55 かチェック
     if (Math.abs(userVal - 55) < 0.0001) {
       showJudge(true);
       playCorrectSound();
@@ -2013,7 +2064,6 @@ function checkP7Answer() {
       playIncorrectSound();
     }
   } else {
-    // 1つずつモード: 現在ステップの累計値チェック
     const targetVal = p7CumulativeVal + p7CurrentAddNum;
     if (Math.abs(userVal - targetVal) < 0.0001) {
       p7CumulativeVal = targetVal;
@@ -2037,13 +2087,9 @@ function checkP7Answer() {
   }
 }
 
-/* -------------------------------------------------------------
- * 6. 「お手本（デモ）」アニメーション共通エンジン
- * ------------------------------------------------------------- */
-let demoSpeedBase = 600; // ms
+let demoSpeedBase = 600;
 
 function toggleDemoSpeed(pagePrefix) {
-  // 「速さふつう」 -> 「速さゆっくり」 -> 「速さはやい」
   const btn = document.getElementById(`${pagePrefix}-speed-btn`);
   if (demoSpeedBase === 600) {
     demoSpeedBase = 1000;
@@ -2060,152 +2106,197 @@ function toggleDemoSpeed(pagePrefix) {
 function setControlsDisabled(pagePrefix, disabled) {
   const page = document.getElementById(`page-${pagePrefix.replace('p', '')}`);
   if (!page) return;
-  
-  const buttons = page.querySelectorAll('button, input');
-  buttons.forEach(b => {
-    b.disabled = disabled;
+  const interactiveElems = page.querySelectorAll('button, input');
+  interactiveElems.forEach(elem => {
+    elem.disabled = disabled;
   });
-
-  const boardKey = pagePrefix;
-  if (boards[boardKey]) {
-    boards[boardKey].setLock(disabled);
+  if (boards[pagePrefix]) {
+    boards[pagePrefix].setLock(disabled);
   }
 }
 
-// ページ④ デモ（単一の数）
-async function startP4Demo() {
-  setControlsDisabled('p4', true);
-  const board = boards['p4'];
-  board.reset();
-  await new Promise(r => setTimeout(r, 200));
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-  const strVal = p4CurrentVal.toString();
-  const digits = [];
+async function animateAddDigit(board, rodIndex, addVal) {
+  if (addVal <= 0 || rodIndex < 0 || rodIndex >= board.numRods) return;
   
-  // 桁ごとの積み上げ数値を作成
-  let tempBoard = new SorobanBoard('temp-b', { numRods: 8 });
-  tempBoard.setValue(p4CurrentVal);
+  let st = board.state[rodIndex];
+  if (!st) return;
+  let current = st.top * 5 + st.bot;
   
-  for (let r = 0; r < 8; r++) {
-    const val = tempBoard.state[r].top * 5 + tempBoard.state[r].bot;
-    if (val > 0) {
-      // 当該桁をセット
-      board.state[r].top = tempBoard.state[r].top;
-      board.state[r].bot = tempBoard.state[r].bot;
+  if (current + addVal < 10) {
+    if (st.top === 0 && st.bot + addVal < 5) {
+      st.bot += addVal;
       board.updateBeadPositions(true);
       playBeadSound();
-      await new Promise(r => setTimeout(r, demoSpeedBase));
+      await sleep(demoSpeedBase);
+    } else if (st.top === 0 && addVal === 5) {
+      st.top = 1;
+      board.updateBeadPositions(true);
+      playBeadSound();
+      await sleep(demoSpeedBase);
+    } else if (st.top === 0 && addVal > 5) {
+      st.top = 1;
+      st.bot += (addVal - 5);
+      board.updateBeadPositions(true);
+      playBeadSound();
+      await sleep(demoSpeedBase);
+    } else if (st.top === 0 && addVal < 5 && st.bot + addVal >= 5) {
+      st.top = 1;
+      board.updateBeadPositions(true);
+      playBeadSound();
+      await sleep(demoSpeedBase);
+      
+      st.bot -= (5 - addVal);
+      board.updateBeadPositions(true);
+      playBeadSound();
+      await sleep(demoSpeedBase);
+    } else {
+      st.bot += addVal;
+      board.updateBeadPositions(true);
+      playBeadSound();
+      await sleep(demoSpeedBase);
+    }
+  } else {
+    let comp = 10 - addVal;
+    if (st.top === 1 && st.bot < comp) {
+      if (comp >= 5) {
+        let removeBot = comp - 5;
+        if (removeBot > 0) {
+          st.bot -= removeBot;
+          board.updateBeadPositions(true);
+          playBeadSound();
+          await sleep(demoSpeedBase);
+        }
+      } else {
+        let addOneBeads = 5 - comp;
+        if (addOneBeads > 0) {
+          st.bot += addOneBeads;
+          board.updateBeadPositions(true);
+          playBeadSound();
+          await sleep(demoSpeedBase);
+        }
+      }
+
+      st.top = 0;
+      board.updateBeadPositions(true);
+      playBeadSound();
+      await sleep(demoSpeedBase);
+
+      await animateAddDigit(board, rodIndex - 1, 1);
+    } else {
+      st.bot -= comp;
+      board.updateBeadPositions(true);
+      playBeadSound();
+      await sleep(demoSpeedBase);
+      await animateAddDigit(board, rodIndex - 1, 1);
     }
   }
-
-  // 1秒後に自動ご破算
-  await new Promise(r => setTimeout(r, 1000));
-  board.reset();
-  setControlsDisabled('p4', false);
 }
 
-// ページ⑤ デモ（数を入れる）
-async function startP5Demo() {
-  setControlsDisabled('p5', true);
-  const board = boards['p5'];
-  board.reset();
-  await new Promise(r => setTimeout(r, 200));
-
-  let tempBoard = new SorobanBoard('temp-b5', { numRods: 8 });
-  tempBoard.setValue(p5TargetVal);
+async function animateSubDigit(board, rodIndex, subVal) {
+  if (subVal <= 0 || rodIndex < 0 || rodIndex >= board.numRods) return;
   
-  for (let r = 0; r < 8; r++) {
-    const st = tempBoard.state[r];
-    if (st.top > 0 || st.bot > 0) {
-      if (st.top > 0) {
-        board.state[r].top = 1;
-        board.updateBeadPositions(true);
-        playBeadSound();
-        await new Promise(r => setTimeout(r, demoSpeedBase * 0.5));
-      }
-      if (st.bot > 0) {
-        board.state[r].bot = st.bot;
-        board.updateBeadPositions(true);
-        playBeadSound();
-        await new Promise(r => setTimeout(r, demoSpeedBase));
+  let st = board.state[rodIndex];
+  if (!st) return;
+  let current = st.top * 5 + st.bot;
+  
+  if (current >= subVal) {
+    if (st.bot >= subVal) {
+      st.bot -= subVal;
+      board.updateBeadPositions(true);
+      playBeadSound();
+      await sleep(demoSpeedBase);
+    } else if (st.top === 1 && subVal === 5) {
+      st.top = 0;
+      board.updateBeadPositions(true);
+      playBeadSound();
+      await sleep(demoSpeedBase);
+    } else if (st.top === 1 && subVal > 5 && st.bot >= subVal - 5) {
+      st.bot -= (subVal - 5);
+      board.updateBeadPositions(true);
+      playBeadSound();
+      await sleep(demoSpeedBase);
+
+      st.top = 0;
+      board.updateBeadPositions(true);
+      playBeadSound();
+      await sleep(demoSpeedBase);
+    } else if (st.top === 1 && subVal < 5 && st.bot < subVal) {
+      st.bot += (5 - subVal);
+      board.updateBeadPositions(true);
+      playBeadSound();
+      await sleep(demoSpeedBase);
+
+      st.top = 0;
+      board.updateBeadPositions(true);
+      playBeadSound();
+      await sleep(demoSpeedBase);
+    }
+  } else {
+    await animateSubDigit(board, rodIndex - 1, 1);
+    let add = 10 - subVal;
+    await animateAddDigit(board, rodIndex, add);
+  }
+}
+
+async function animateNumberOp(board, val, op) {
+  let remaining = Math.round(Math.abs(val) * 1000);
+  let factors = [10000000, 1000000, 100000, 10000, 1000, 100, 10, 1];
+
+  for (let r = 0; r < board.numRods; r++) {
+    let digit = Math.floor(remaining / factors[r]) % 10;
+    if (digit > 0) {
+      if (op === '+' || op === 'add') {
+        await animateAddDigit(board, r, digit);
+      } else {
+        await animateSubDigit(board, r, digit);
       }
     }
   }
+}
 
-  await new Promise(r => setTimeout(r, 1000));
-  board.reset();
+async function startP5Demo() {
+  setControlsDisabled('p5', true);
+  boards['p5'].reset();
+  await sleep(300);
+  await animateNumberOp(boards['p5'], p5TargetVal, '+');
   setControlsDisabled('p5', false);
 }
 
-// ページ⑥ デモ（たし算・ひき算）
 async function startP6Demo() {
   setControlsDisabled('p6', true);
-  const board = boards['p6'];
-  board.reset();
-  await new Promise(r => setTimeout(r, 200));
-
-  // 1. 被加数 / 被減数 を入力
-  board.setValue(p6Num1);
-  playBeadSound();
-  await new Promise(r => setTimeout(r, demoSpeedBase));
-
-  // 補数ステップ判定の例示デモ
-  // 補数（5/10の繰り上がり・繰り下がり）の中間状態「・」を挟んで表示
-  const isComplement = (p6Op === '+' && (p6Num1 % 10 + p6Num2 % 10 >= 10)) || (p6Op === '-' && (p6Num1 % 10 < p6Num2 % 10));
-
-  if (isComplement) {
-    // 中間「・」ステップ
-    await new Promise(r => setTimeout(r, demoSpeedBase * 0.5));
-    playBeadSound();
-  }
-
-  // 2. 最終計算結果
-  board.setValue(p6AnsVal);
-  playBeadSound();
-  await new Promise(r => setTimeout(r, demoSpeedBase));
-
-  // 自動ご破算と解除
-  await new Promise(r => setTimeout(r, 1000));
-  board.reset();
+  boards['p6'].reset();
+  await sleep(300);
+  await animateNumberOp(boards['p6'], p6Num1, '+');
+  await sleep(demoSpeedBase);
+  await animateNumberOp(boards['p6'], p6Num2, p6Op);
   setControlsDisabled('p6', false);
 }
 
-// ページ⑦ デモ（1～10までたす）
 async function startP7Demo() {
   setControlsDisabled('p7', true);
-  const board = boards['p7'];
-  board.reset();
-  await new Promise(r => setTimeout(r, 200));
-
-  let currentVal = 0;
-  for (let add = 1; add <= 10; add++) {
-    currentVal += add;
-    board.setValue(currentVal);
-    playBeadSound();
-    await new Promise(r => setTimeout(r, demoSpeedBase));
+  if (p7StepMode === 'continuous') {
+    boards['p7'].reset();
+    for (let i = 1; i <= 10; i++) {
+      await animateNumberOp(boards['p7'], i, '+');
+      await sleep(200);
+    }
+  } else {
+    await animateNumberOp(boards['p7'], p7CurrentAddNum, '+');
   }
-
-  await new Promise(r => setTimeout(r, 1000));
-  board.reset();
   setControlsDisabled('p7', false);
 }
 
-/* -------------------------------------------------------------
- * 7. 判定とモーダル管理
- * ------------------------------------------------------------- */
 function showJudge(isCorrect) {
   const overlay = document.getElementById('judge-overlay');
   const symbol = document.getElementById('judge-symbol');
+  if (!overlay || !symbol) return;
 
-  if (isCorrect) {
-    symbol.textContent = '⭕';
-    symbol.style.color = '#e53e3e';
-  } else {
-    symbol.textContent = '❌';
-    symbol.style.color = '#3182ce';
-  }
-
+  symbol.textContent = isCorrect ? '⭕' : '❌';
+  symbol.style.color = isCorrect ? '#38a169' : '#e53e3e';
   overlay.style.display = 'flex';
+
   setTimeout(() => {
     overlay.style.display = 'none';
   }, 800);
@@ -2214,14 +2305,13 @@ function showJudge(isCorrect) {
 function showClearModal() {
   playFanfareSound();
   const modal = document.getElementById('clear-modal');
-  modal.classList.add('active');
+  if (modal) modal.classList.add('active');
 }
 
 function closeClearModal() {
   const modal = document.getElementById('clear-modal');
-  modal.classList.remove('active');
+  if (modal) modal.classList.remove('active');
 
-  // ステージ進行
   if (currentPage === 4) {
     p4Stage++;
     p4Step = 1;
@@ -2236,8 +2326,6 @@ function closeClearModal() {
     p6NextQuestion();
   } else if (currentPage === 7) {
     initP7Problem();
-  } else {
-    goToPage(1);
   }
 }
 </script>
