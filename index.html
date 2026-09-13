@@ -722,6 +722,19 @@
         <div class="menu-title-cell">
           <h1>そろばん</h1>
           <svg viewBox="0 0 180 65" width="160" height="58" style="margin-top: 14px;">
+            <defs>
+              <linearGradient id="yellow-grad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#E8DF81"/>
+                <stop offset="50%" stop-color="#FCEA89"/>
+                <stop offset="100%" stop-color="#EECE67"/>
+              </linearGradient>
+              <linearGradient id="orange-grad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#F99934"/>
+                <stop offset="50%" stop-color="#FAB053"/>
+                <stop offset="100%" stop-color="#E16F40"/>
+              </linearGradient>
+            </defs>
+
             <rect x="0" y="0" width="180" height="65" fill="#ffffff" />
             <rect x="0" y="0" width="180" height="8" fill="#784D3F"/>
             <rect x="0" y="57" width="180" height="8" fill="#784D3F"/>
@@ -783,19 +796,6 @@
             <polygon points="167,35 174,38.5 167,42 160,38.5" fill="url(#yellow-grad)"/>
             <polygon points="167,42 174,45.5 167,49 160,45.5" fill="url(#yellow-grad)"/>
             <polygon points="167,49 174,52.5 167,56 160,52.5" fill="url(#yellow-grad)"/>
-
-            <defs>
-              <linearGradient id="yellow-grad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#E8DF81"/>
-                <stop offset="50%" stop-color="#FCEA89"/>
-                <stop offset="100%" stop-color="#EECE67"/>
-              </linearGradient>
-              <linearGradient id="orange-grad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#F99934"/>
-                <stop offset="50%" stop-color="#FAB053"/>
-                <stop offset="100%" stop-color="#E16F40"/>
-              </linearGradient>
-            </defs>
           </svg>
         </div>
         <div class="menu-desc-cell">
@@ -1037,6 +1037,7 @@
   </footer>
 </div>
 
+<!-- Judge and Modal overlays -->
 <div id="judge-overlay">
   <div id="judge-symbol">⭕</div>
 </div>
@@ -1078,7 +1079,6 @@ function updateAppScale() {
 
 window.addEventListener('resize', updateAppScale);
 
-// Web Audio API helpers for interactive sound effects
 function getAudioContext() {
   if (!audioCtx) {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -1116,7 +1116,7 @@ function playBeadSound() {
   try {
     const now = audioCtx.currentTime;
 
-    // 1. Noise burst
+    // Noise burst
     const bufferSize = Math.floor(audioCtx.sampleRate * 0.012);
     const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
     const data = buffer.getChannelData(0);
@@ -1139,7 +1139,7 @@ function playBeadSound() {
     noiseFilter.connect(noiseGain);
     noiseGain.connect(audioCtx.destination);
 
-    // 2. Wood resonance tone
+    // Wood resonance tone
     const osc = audioCtx.createOscillator();
     const oscGain = audioCtx.createGain();
     osc.type = 'triangle';
@@ -1806,14 +1806,88 @@ function p5NextQuestion() {
   document.getElementById('p5-q-title').textContent = `${p5TargetVal} を 入れましょう`;
 }
 
+// P5：直近10問の履歴
+let p5RecentProblems = [];
+
 function generateP5RandomProblem() {
+  // 0を含む問題と、0を含まない問題を分けて用意
+  let zeroProblems;
+  let normalProblems;
+
   if (globalGrade === 3) {
-    const arr = [24, 305, 1080, 5006, 720, 9034, 150, 608];
-    return arr[Math.floor(Math.random() * arr.length)];
+    // 空位（0）を含む問題
+    zeroProblems = [
+      305, 1080, 5006, 720, 9034, 150, 608
+    ];
+
+    // 空位（0）を含まない問題
+    normalProblems = [
+      24, 36, 47, 58, 63, 75, 86, 92,
+      123, 245, 356, 471, 582, 693, 714, 825,
+      1345, 2467, 3578, 4689,
+      1234, 2345, 3456, 4567,
+      5678, 6789, 7891, 8912
+    ];
   } else {
-    const arr = [2.5, 0.4, 15.6, 102.3, 0.85, 4.07, 20.15, 6.90];
-    return arr[Math.floor(Math.random() * arr.length)];
+    // 空位（0）を含む問題
+    zeroProblems = [
+      0.4, 102.3, 0.85, 20.15
+    ];
+
+    // 空位（0）を含まない問題
+    normalProblems = [
+      2.5, 3.6, 4.7, 5.8, 6.9,
+      12.3, 14.5, 16.7, 23.4, 25.6,
+      31.4, 34.7, 42.5, 46.8, 52.3,
+      56.7, 63.4, 67.8, 71.5, 74.2,
+      81.6, 85.3, 92.4, 96.7
+    ];
   }
+
+  // 直近10問に出ていない問題だけを候補にする
+  function getAvailableProblems(list) {
+    return list.filter(problem => !p5RecentProblems.includes(problem));
+  }
+
+  // 約10%の確率で「空位（0）のある問題」
+  const useZeroProblem = Math.random() < 0.1;
+
+  let candidates;
+
+  if (useZeroProblem) {
+    candidates = getAvailableProblems(zeroProblems);
+
+    // 直近10問に全部出ていた場合は、通常問題から選ぶ
+    if (candidates.length === 0) {
+      candidates = getAvailableProblems(normalProblems);
+    }
+  } else {
+    candidates = getAvailableProblems(normalProblems);
+
+    // 通常問題が全部直近10問に入っている場合は、空位問題から選ぶ
+    if (candidates.length === 0) {
+      candidates = getAvailableProblems(zeroProblems);
+    }
+  }
+
+  // 万一候補がなくなった場合
+  // （問題数が直近10問より少ない場合など）
+  if (candidates.length === 0) {
+    candidates = [...normalProblems, ...zeroProblems];
+  }
+
+  // 候補からランダムに1問選ぶ
+  const problem = candidates[Math.floor(Math.random() * candidates.length)];
+
+  // 履歴に追加
+  p5RecentProblems.push(problem);
+
+  // 直近10問だけ残す
+  if (p5RecentProblems.length > 10) {
+    p5RecentProblems.shift();
+  }
+
+  return problem;
 }
 
 function resetP5DemoBoard() {
@@ -2236,7 +2310,7 @@ async function animateSubDigit(board, rodIndex, subVal) {
   } else {
     await animateSubDigit(board, rodIndex - 1, 1);
     let add = 10 - subVal;
-    await animateAddDigit(board, rodIndex, add);
+    await animateAddDigit(board, r, add);
   }
 }
 
@@ -2261,6 +2335,10 @@ async function startP5Demo() {
   boards['p5'].reset();
   await sleep(300);
   await animateNumberOp(boards['p5'], p5TargetVal, '+');
+
+  await sleep(1500);
+  boards['p5'].reset();
+
   setControlsDisabled('p5', false);
 }
 
@@ -2271,20 +2349,35 @@ async function startP6Demo() {
   await animateNumberOp(boards['p6'], p6Num1, '+');
   await sleep(demoSpeedBase);
   await animateNumberOp(boards['p6'], p6Num2, p6Op);
+
+  await sleep(1500);
+  boards['p6'].reset();
+
   setControlsDisabled('p6', false);
 }
 
 async function startP7Demo() {
   setControlsDisabled('p7', true);
+
   if (p7StepMode === 'continuous') {
     boards['p7'].reset();
+
     for (let i = 1; i <= 10; i++) {
+      document.getElementById('p7-step-badge').textContent = `＋${i}`;
       await animateNumberOp(boards['p7'], i, '+');
       await sleep(200);
     }
+
+    await sleep(1500);
+    boards['p7'].reset();
+
   } else {
+    const beforeDemoValue = p7CumulativeVal;
     await animateNumberOp(boards['p7'], p7CurrentAddNum, '+');
+    await sleep(1500);
+    boards['p7'].setValue(beforeDemoValue);
   }
+
   setControlsDisabled('p7', false);
 }
 
