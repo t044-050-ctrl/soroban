@@ -517,6 +517,16 @@
     transition: top 0.12s cubic-bezier(0.25, 1, 0.5, 1), filter 0.15s;
     touch-action: none;
     cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .bead:focus,
+  .bead:focus-visible {
+    outline: none;
+    box-shadow: none;
   }
 
   .bead-shape {
@@ -527,6 +537,7 @@
     background: linear-gradient(180deg, var(--bead-yellow-top) 0%, var(--bead-yellow-mid) 50%, var(--bead-yellow-bot) 100%);
     transition: background 0.15s;
     pointer-events: none;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .bead.active .bead-shape {
