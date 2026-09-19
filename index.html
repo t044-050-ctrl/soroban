@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>そろばん</title>
+<title>そろばん学習アプリ</title>
 
 <style>
   :root {
@@ -302,6 +302,60 @@
   .icon-btn.active {
     background-color: var(--btn-blue);
     color: #ffffff;
+  }
+
+  /* Page 6：3年生用バージョン選択 */
+  .p6-version-area {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  /* 学年ボタンは「ご破算」「位：非表示」と同じ高さの一列に配置 */
+  .p6-grade-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 38px;
+  }
+
+  /* バージョン選択は学年選択の下に配置 */
+  .p6-version-buttons {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    min-height: 30px;
+  }
+
+  .p6-version-btn {
+    height: 30px;
+    padding: 0 10px;
+    font-size: 0.82rem;
+    font-weight: bold;
+    border: 2px solid #3182CE;
+    border-radius: 8px;
+    background-color: #ffffff;
+    color: #3182CE;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+  }
+
+  .p6-version-btn.active {
+    background-color: #3182CE;
+    color: #ffffff;
+  }
+
+  .p6-version-btn:hover {
+    background-color: #3182CE;
+    color: #ffffff;
+  }
+
+  .p6-version-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
   }
 
   .page {
@@ -964,12 +1018,23 @@
         </div>
         
         <div style="width: 1134px; margin-top: 56px; display: flex; align-items: center; justify-content: space-between; position: relative;">
-          <div style="display: flex; gap: 8px; align-items: center;">
-            <button class="gohasan-btn" id="p6-gohasan-btn" style="height: 38px; padding: 0 14px; font-size: 0.95rem;" onclick="resetP6DemoBoard()">ご破算</button>
-            <button class="toggle-label-btn" id="p6-toggle-label-btn" onclick="toggleDigitLabels('p6')">位：非表示</button>
-            <div class="grade-btn-group">
-              <button class="grade-btn active" id="p6-grade-3" onclick="setGlobalGrade(3)">3年</button>
-              <button class="grade-btn" id="p6-grade-4" onclick="setGlobalGrade(4)">4年</button>
+          <div class="p6-left-controls" style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px;">
+            <!-- 1段目：ご破算・位・学年を同じ高さで一列に配置 -->
+            <div class="p6-grade-row">
+              <button class="gohasan-btn" id="p6-gohasan-btn" style="height: 38px; padding: 0 14px; font-size: 0.95rem;" onclick="resetP6DemoBoard()">ご破算</button>
+              <button class="toggle-label-btn" id="p6-toggle-label-btn" onclick="toggleDigitLabels('p6')">位：非表示</button>
+
+              <div class="grade-btn-group">
+                <button class="grade-btn active" id="p6-grade-3" onclick="setGlobalGrade(3)">3年</button>
+                <button class="grade-btn" id="p6-grade-4" onclick="setGlobalGrade(4)">4年</button>
+              </div>
+            </div>
+
+            <!-- 2段目：3年生だけ表示するバージョン選択 -->
+            <div class="p6-version-buttons" id="p6-version-controls">
+              <button class="p6-version-btn active" id="p6-version-basic" onclick="setP6Version('basic')">きほん</button>
+              <button class="p6-version-btn" id="p6-version-5bead" onclick="setP6Version('5bead')">5だまを使って</button>
+              <button class="p6-version-btn" id="p6-version-carry" onclick="setP6Version('carry')">くり上がり・くり下がり</button>
             </div>
           </div>
           
@@ -1244,6 +1309,21 @@ function setGlobalGrade(grade) {
       else el.classList.remove('active');
     }
   });
+
+  // P6：3年生用バージョン選択の表示・非表示
+  const p6VersionControls = document.getElementById('p6-version-controls');
+  if (p6VersionControls) {
+    p6VersionControls.style.display = grade === 3 ? 'flex' : 'none';
+  }
+
+  // 4年生では「きほん」に戻しておく
+  if (grade === 4) {
+    p6Version = 'basic';
+    ['basic', '5bead', 'carry'].forEach(v => {
+      const btn = document.getElementById(`p6-version-${v}`);
+      if (btn) btn.classList.toggle('active', v === 'basic');
+    });
+  }
 
   if (currentPage === 3) {
     initP3Board();
@@ -1914,6 +1994,7 @@ function checkP5Answer() {
 }
 
 let p6Mode = 'add';
+let p6Version = 'basic';
 let p6Stage = 1;
 let p6Step = 1;
 let p6TotalSteps = 6;
@@ -1934,6 +2015,20 @@ function setP6Mode(mode) {
   initP6Problem();
 }
 
+/* 3年生用バージョン切り替え */
+function setP6Version(version) {
+  if (globalGrade !== 3) return;
+
+  p6Version = version;
+
+  ['basic', '5bead', 'carry'].forEach(v => {
+    const btn = document.getElementById(`p6-version-${v}`);
+    if (btn) btn.classList.toggle('active', v === version);
+  });
+
+  initP6Problem();
+}
+
 function initP6Problem() {
   p6Stage = 1;
   p6Step = 1;
@@ -1941,72 +2036,296 @@ function initP6Problem() {
   p6NextQuestion();
 }
 
+/* =========================================
+   5だまを使って：固定問題
+   ========================================= */
+const p6FiveBeadProblems = {
+  add: {
+    stage1: [
+      [14, 31],
+      [34, 12]
+    ],
+    stage2: [
+      [32, 27],
+      [21, 34],
+      [13, 23],
+      [34, 43],
+      [42, 44]
+    ],
+    // 5の補数を使う2桁＋2桁
+    stage3: [
+      [23, 14],
+      [24, 13],
+      [42, 23],
+      [33, 14],
+      [34, 23]
+    ],
+    // 5の補数を使う2桁＋2桁
+    stage4: [
+      [13, 24],
+      [22, 34],
+      [32, 24],
+      [43, 14],
+      [24, 33]
+    ]
+  },
+  sub: {
+    stage1: [
+      [85, 61],
+      [96, 72]
+    ],
+    stage2: [
+      [95, 64],
+      [55, 12],
+      [76, 43],
+      [86, 42],
+      [57, 14]
+    ],
+    // 5の補数を使う2桁－2桁
+    stage3: [
+      [23, 14],
+      [31, 23],
+      [42, 13],
+      [52, 24],
+      [43, 14]
+    ],
+    // 5の補数を使う2桁－2桁
+    stage4: [
+      [24, 13],
+      [32, 14],
+      [43, 24],
+      [41, 23],
+      [52, 34]
+    ]
+  }
+};
+
+/* =========================================
+   くり上がり・くり下がり：固定問題
+   ========================================= */
+const p6CarryProblems = {
+  add: {
+    stage1: [
+      [9, 3],
+      [7, 6]
+    ],
+    stage2: [
+      [56, 55],
+      [27, 93],
+      [58, 79],
+      [87, 27],
+      [65, 86]
+    ],
+    // くり上がりのある2桁＋2桁
+    stage3: [
+      [27, 15],
+      [38, 24],
+      [46, 27],
+      [57, 36],
+      [68, 25]
+    ],
+    // くり上がりのある2桁＋2桁
+    stage4: [
+      [29, 34],
+      [47, 36],
+      [58, 27],
+      [69, 25],
+      [76, 18]
+    ]
+  },
+  sub: {
+    stage1: [
+      [11, 3],
+      [13, 7]
+    ],
+    stage2: [
+      [92, 35],
+      [73, 14],
+      [92, 63],
+      [63, 28],
+      [64, 18]
+    ],
+    // くり下がりのある2桁－2桁
+    stage3: [
+      [42, 18],
+      [53, 27],
+      [61, 24],
+      [72, 35],
+      [84, 16]
+    ],
+    // くり下がりのある2桁－2桁
+    stage4: [
+      [51, 26],
+      [62, 37],
+      [73, 48],
+      [84, 29],
+      [95, 47]
+    ]
+  }
+};
+
+/* 5だま・くり上がり/くり下がりのステージ5以降用 */
+function getRandomFromP6Pool() {
+  const pool = p6PoolHistory;
+  if (pool.length === 0) return null;
+
+  if (p6Step === 1 || !Array.isArray(p6PoolHistory._stage5Used)) {
+    p6PoolHistory._stage5Used = [];
+  }
+
+  let candidates = pool.filter((_, index) =>
+    !p6PoolHistory._stage5Used.includes(index)
+  );
+
+  if (candidates.length === 0) {
+    p6PoolHistory._stage5Used = [];
+    candidates = [...pool];
+  }
+
+  const selected = candidates[Math.floor(Math.random() * candidates.length)];
+  const originalIndex = pool.indexOf(selected);
+  p6PoolHistory._stage5Used.push(originalIndex);
+
+  return selected;
+}
+
 function p6NextQuestion() {
-  if (p6Stage === 1) {
-    p6TotalSteps = globalGrade === 3 ? 6 : 3;
-  } else if (p6Stage === 2) {
-    p6TotalSteps = 3;
+  /* -------------------------
+     ステージごとの問題数
+     ------------------------- */
+  if (p6Version === 'basic' || globalGrade === 4) {
+    // 「きほん」は現在の問題構成をそのまま維持
+    if (p6Stage === 1) {
+      p6TotalSteps = globalGrade === 3 ? 6 : 3;
+    } else if (p6Stage === 2) {
+      p6TotalSteps = 3;
+    } else {
+      p6TotalSteps = 5;
+    }
   } else {
-    p6TotalSteps = 5;
+    // 新しい3年生用バージョン
+    p6TotalSteps = p6Stage === 1 ? 2 : 5;
   }
 
   document.getElementById('p6-stage-badge').textContent = `ステージ ${p6Stage}`;
   document.getElementById('p6-progress-badge').textContent = `${p6Step} / ${p6TotalSteps}`;
   boards['p6'].reset();
 
-  if (p6Stage === 1) {
-    if (globalGrade === 3) {
-      const adds = [[63,25], [48,51], [63,31], [25,23], [17,82], [12,67]];
-      const subs = [[48,36], [34,12], [68,52], [78,63], [83,73], [99,18]];
-      
-      let item;
-      if (p6Mode === 'sub') {
-        item = subs[(p6Step - 1) % subs.length];
-        p6Op = '-';
+  /* =========================================
+     きほん：現在の問題をそのまま使用
+     ========================================= */
+  if (p6Version === 'basic' || globalGrade === 4) {
+    if (p6Stage === 1) {
+      if (globalGrade === 3) {
+        const adds = [[63,25], [48,51], [63,31], [25,23], [17,82], [12,67]];
+        const subs = [[48,36], [34,12], [68,52], [78,63], [83,73], [99,18]];
+
+        let item;
+        if (p6Mode === 'sub') {
+          item = subs[(p6Step - 1) % subs.length];
+          p6Op = '-';
+        } else {
+          item = adds[(p6Step - 1) % adds.length];
+          p6Op = '+';
+        }
+        p6Num1 = item[0];
+        p6Num2 = item[1];
       } else {
-        item = adds[(p6Step - 1) % adds.length];
-        p6Op = '+';
+        const adds = [[2.47,3.63], [4.96,3.59], [3.87,7.28]];
+        const subs = [[1.25,0.86], [2.43,1.78], [5.14,3.96]];
+
+        let item;
+        if (p6Mode === 'sub') {
+          item = subs[(p6Step - 1) % subs.length];
+          p6Op = '-';
+        } else {
+          item = adds[(p6Step - 1) % adds.length];
+          p6Op = '+';
+        }
+        p6Num1 = item[0];
+        p6Num2 = item[1];
       }
-      p6Num1 = item[0];
-      p6Num2 = item[1];
     } else {
-      const adds = [[2.47,3.63], [4.96,3.59], [3.87,7.28]];
-      const subs = [[1.25,0.86], [2.43,1.78], [5.14,3.96]];
-      
-      let item;
-      if (p6Mode === 'sub') {
-        item = subs[(p6Step - 1) % subs.length];
-        p6Op = '-';
-      } else {
-        item = adds[(p6Step - 1) % adds.length];
-        p6Op = '+';
-      }
-      p6Num1 = item[0];
-      p6Num2 = item[1];
-    }
-  } else {
-    if (p6Stage === 2 || p6Stage === 3) {
-      const prob = generateP6RandomProblem();
-      p6Num1 = prob.n1;
-      p6Num2 = prob.n2;
-      p6Op = prob.op;
-      p6PoolHistory.push(prob);
-    } else {
-      if (p6PoolHistory.length === 0) {
+      if (p6Stage === 2 || p6Stage === 3) {
         const prob = generateP6RandomProblem();
         p6Num1 = prob.n1;
         p6Num2 = prob.n2;
         p6Op = prob.op;
+        p6PoolHistory.push(prob);
       } else {
-        const prob = p6PoolHistory[Math.floor(Math.random() * p6PoolHistory.length)];
-        p6Num1 = prob.n1;
-        p6Num2 = prob.n2;
-        p6Op = prob.op;
+        if (p6PoolHistory.length === 0) {
+          const prob = generateP6RandomProblem();
+          p6Num1 = prob.n1;
+          p6Num2 = prob.n2;
+          p6Op = prob.op;
+        } else {
+          const prob = p6PoolHistory[Math.floor(Math.random() * p6PoolHistory.length)];
+          p6Num1 = prob.n1;
+          p6Num2 = prob.n2;
+          p6Op = prob.op;
+        }
+      }
+    }
+
+  /* =========================================
+     5だまを使って
+     ========================================= */
+  } else if (p6Version === '5bead') {
+    const stageKey = `stage${Math.min(p6Stage, 4)}`;
+    const data = p6FiveBeadProblems[p6Mode][stageKey];
+
+    if (p6Stage <= 4) {
+      const item = data[p6Step - 1];
+      p6Num1 = item[0];
+      p6Num2 = item[1];
+      p6Op = p6Mode === 'add' ? '+' : '-';
+
+      p6PoolHistory.push({
+        n1: p6Num1,
+        n2: p6Num2,
+        op: p6Op
+      });
+    } else {
+      const selected = getRandomFromP6Pool();
+      if (selected) {
+        p6Num1 = selected.n1;
+        p6Num2 = selected.n2;
+        p6Op = selected.op;
+      }
+    }
+
+  /* =========================================
+     くり上がり・くり下がり
+     ========================================= */
+  } else if (p6Version === 'carry') {
+    const stageKey = `stage${Math.min(p6Stage, 4)}`;
+    const data = p6CarryProblems[p6Mode][stageKey];
+
+    if (p6Stage <= 4) {
+      const item = data[p6Step - 1];
+      p6Num1 = item[0];
+      p6Num2 = item[1];
+      p6Op = p6Mode === 'add' ? '+' : '-';
+
+      p6PoolHistory.push({
+        n1: p6Num1,
+        n2: p6Num2,
+        op: p6Op
+      });
+    } else {
+      const selected = getRandomFromP6Pool();
+      if (selected) {
+        p6Num1 = selected.n1;
+        p6Num2 = selected.n2;
+        p6Op = selected.op;
       }
     }
   }
 
-  p6AnsVal = p6Op === '+' ? Math.round((p6Num1 + p6Num2) * 1000) / 1000 : Math.round((p6Num1 - p6Num2) * 1000) / 1000;
+  p6AnsVal = p6Op === '+'
+    ? Math.round((p6Num1 + p6Num2) * 1000) / 1000
+    : Math.round((p6Num1 - p6Num2) * 1000) / 1000;
+
   document.getElementById('p6-q-title').textContent = `${p6Num1} ${p6Op} ${p6Num2} = ?`;
 }
 
