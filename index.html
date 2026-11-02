@@ -4,9 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>そろばん学習アプリ</title>
-<meta property="og:title" content="そろばん学習アプリ">
-<meta property="og:description" content="【３年４年算数そろばん】学年を選ぶと問題が変わります。お手本を見ながら進めることができます。">
-<meta property="og:type" content="website">
 
 <style>
   :root {
@@ -2425,11 +2422,29 @@ function checkP6Answer() {
 let p7CurrentAddNum = 1;
 let p7CumulativeVal = 0;
 let p7StepMode = 'continuous';
+let p7StepStartState = null;
+
+function saveP7StepStartState() {
+  p7StepStartState = boards['p7'].state.map(rod => ({
+    top: rod.top,
+    bot: rod.bot
+  }));
+}
+
+function restoreP7StepStartState() {
+  if (!p7StepStartState) return;
+  boards['p7'].state = p7StepStartState.map(rod => ({
+    top: rod.top,
+    bot: rod.bot
+  }));
+  boards['p7'].updateBeadPositions(true);
+}
 
 function initP7Problem() {
   p7CurrentAddNum = 1;
   p7CumulativeVal = 0;
   boards['p7'].reset();
+  saveP7StepStartState();
   updateP7UI();
 }
 
@@ -2483,6 +2498,7 @@ function checkP7Answer() {
         }, 1000);
       } else {
         p7CurrentAddNum++;
+        saveP7StepStartState();
         setTimeout(() => {
           updateP7UI();
         }, 1000);
@@ -2490,6 +2506,7 @@ function checkP7Answer() {
     } else {
       showJudge(false);
       playIncorrectSound();
+      restoreP7StepStartState();
     }
   }
 }
@@ -2641,9 +2658,13 @@ async function animateSubDigit(board, rodIndex, subVal) {
       await sleep(demoSpeedBase);
     }
   } else {
+    // 上の位から1を借りられない最上位では処理を終了する
+    if (rodIndex === 0) return;
+
     await animateSubDigit(board, rodIndex - 1, 1);
     let add = 10 - subVal;
-    await animateAddDigit(board, r, add);
+    // r は未定義のため、現在処理している rodIndex を渡す
+    await animateAddDigit(board, rodIndex, add);
   }
 }
 
@@ -2677,16 +2698,20 @@ async function startP5Demo() {
 
 async function startP6Demo() {
   setControlsDisabled('p6', true);
-  boards['p6'].reset();
-  await sleep(300);
-  await animateNumberOp(boards['p6'], p6Num1, '+');
-  await sleep(demoSpeedBase);
-  await animateNumberOp(boards['p6'], p6Num2, p6Op);
-
-  await sleep(1500);
-  boards['p6'].reset();
-
-  setControlsDisabled('p6', false);
+  try {
+    boards['p6'].reset();
+    await sleep(300);
+    await animateNumberOp(boards['p6'], p6Num1, '+');
+    await sleep(demoSpeedBase);
+    await animateNumberOp(boards['p6'], p6Num2, p6Op);
+    await sleep(1500);
+  } catch (error) {
+    console.error('P6お手本の再生中にエラーが発生しました:', error);
+  } finally {
+    // エラーが起きても、そろばんを初期化して操作を再び有効にする
+    boards['p6'].reset();
+    setControlsDisabled('p6', false);
+  }
 }
 
 async function startP7Demo() {
